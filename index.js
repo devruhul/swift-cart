@@ -40,12 +40,13 @@ function initGlobalConnections() {
   document.addEventListener("click", (event) => {
     const cartTrigger = event.target.closest("[data-cart-trigger]");
     if (cartTrigger && cartTrigger.tagName === "BUTTON") {
-      const totalItems = getCart().reduce(
-        (sum, item) => sum + Number(item.qty || 0),
-        0,
-      );
+      const cart = getCart();
+      const totalItems = cart.reduce((sum, item) => sum + Number(item.qty || 0), 0);
+      const totalPrice = calculateCartTotal(cart);
       window.alert(
-        totalItems ? `Cart items: ${totalItems}` : "Your cart is empty.",
+        totalItems
+          ? `Cart items: ${totalItems}\nTotal price: ${formatPrice(totalPrice)}`
+          : "Your cart is empty.",
       );
       return;
     }
@@ -423,6 +424,14 @@ function updateCartBadges() {
     badge.textContent = String(count);
     badge.classList.toggle("hidden", count === 0);
   });
+}
+
+function calculateCartTotal(cart) {
+  return cart.reduce((sum, item) => {
+    const qty = Number(item.qty || 0);
+    const price = Number(item.price || 0);
+    return sum + qty * price;
+  }, 0);
 }
 
 function toCategoryLabel(category) {
